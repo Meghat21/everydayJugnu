@@ -9,10 +9,12 @@ import Dashboard from './Pages/Dashboard';
 import ContactUs from './Pages/ContactUs';
 import Header from './Components/Header';
 import Projects from './Pages/Projects';
+import FooterBlog from './Components/FooterBlog';
 
 function App() {
 
   return (
+    <div >
     <BrowserRouter>
     <Header/>
       <Routes>
@@ -24,7 +26,9 @@ function App() {
         <Route path='/contact' element={<ContactUs/>}/>
         <Route path='/projects' element={<Projects/>}/>
       </Routes>
+      <FooterBlog/>
     </BrowserRouter>      
+    </div>
   )
 }
 
