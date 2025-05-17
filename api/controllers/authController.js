@@ -27,27 +27,36 @@ export const Signup=async(req,res,next)=>{
 }
 
 
-export const Signin=async(req,res,next)=>{
-    const {email,password}=req.body;
-    if(!email || !password || email=='' || password==''){
-        next(errorHandler(400,"All fields are required"));
+export const Signin = async (req, res, next) => {
+  const { email, password } = req.body;
+
+  if (!email || !password || email === '' || password === '') {
+    next(errorHandler(400, 'All fields are required'));
+  }
+
+  try {
+    const validUser = await User.findOne({ email });
+    if (!validUser) {
+      return next(errorHandler(404, 'User not found'));
     }
-    try {
-        const user=await User.findOne({email});
-        if(!user) next(errorHandler(401,"Invalid email or password"));
-        const isMatch=bcrypt.compareSync(password,user.password);
-        if(!isMatch) next(errorHandler(401,"Invalid email or password"));
-        // const token=await user.gen   erateToken();
-        const token=jwt.sign(
-            {id:user._id},process.env.SECRET_KEY
-        );
-        res.status(200).cookie('token',token,{
-            httpOnly:true
-        }).json(user);
-        // res.status(200).json({user});
-    } catch (error) {
-        console.error(error);
-        next(error);
-        
+    const validPassword = bcrypt.compareSync(password, validUser.password);
+    if (!validPassword) {
+      return next(errorHandler(400, 'Invalid password'));
     }
-}
+    const token = jwt.sign(
+      { id: validUser._id, isAdmin: validUser.isAdmin },
+      process.env.SECRET_KEY
+    );
+
+    const { password: pass, ...rest } = validUser._doc;
+
+    res
+      .status(200)
+      .cookie('access_token', token, {
+        httpOnly: true,
+      })
+      .json(rest);
+  } catch (error) {
+    next(error);
+  }
+};

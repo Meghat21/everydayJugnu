@@ -32,7 +32,7 @@ function Signin() {
       }
       setLoading(false);
       if(res.ok){
-        navigate('/signin');
+        navigate('/dashboard');
       }
     } catch (error) {
       console.error(error);
